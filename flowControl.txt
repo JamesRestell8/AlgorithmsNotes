@@ -1,0 +1,2 @@
+using 'break' will exit the loop you are in instantly
+using 'continue' will immediately start the next iteration of a for loop
