@@ -78,7 +78,7 @@ Matrix make_random_mat(int num_rows, int num_cols, int lower, int upper)
   M.elements = calloc(size_M, sizeof(int)); 
   for(int k = 0;  k < size_M; k++){
     M.elements[k] =  (rand() % size); 
-   }
+  }
 return M; 
 }
 

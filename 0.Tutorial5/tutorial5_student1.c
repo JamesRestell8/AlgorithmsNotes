@@ -84,7 +84,9 @@ int find_second_smallest(int arr[], int len)
     copy[i] = arr[i];
   }
   copy[find_min_idx(copy, len)] = INT_MAX;
-  return find_min(copy, len);
+  int min = find_min(copy, len);
+  free(copy);
+  return min;
 }
 
 int find_second_smallest2(int arr[], int len)
