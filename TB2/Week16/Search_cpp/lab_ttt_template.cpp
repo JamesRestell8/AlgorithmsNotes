@@ -62,7 +62,7 @@ public:
     ~matrix()
     {
         // printf("freeing the matrix...\n");
-        free(elements);
+        delete[] elements;
     }
 
     // print all elements in the matrix
@@ -81,42 +81,91 @@ public:
 };
 
 class tictactoe{
-    matrix board;
+    // Initialise a pointer to the board matrix
+    // This memory does not need to be freed as the matrix deconstructor will do that for us.
+    matrix *board;
 
     int isplayable(int i, int j) {
-        if (board.get_elem(i, j) == '*') {
+        if (board->get_elem(i, j) == 0) {
             return 1;
         }
         return 0;
     }
 
-    int pieces_at_row(int i, char player){
+    int pieces_at_row(int i, int player){
+        // Initialise counter:
         int count = 0;
+        // iterate through rows counting friendly pieces
         for(int j = 0; j < 3; j++){
-            if(board.get_elem(i, j) == player) count++;
+            if(board->get_elem(i, j) == player) count++;
         }
         return count;
     }
-    int pieces_at_col(int j, char player){
-        //TODO: Count player's pieces at j-th column
+    int pieces_at_col(int j, int player){
+        // Initialise counter:
+        int count = 0;
+        // iterate through columns counting friendly pieces
+        for (int i = 0; i < 3; i++)
+        {
+            if (board->get_elem(i, j) == player)
+            {
+                count++;
+            }
+        }
+        return count;
     }
 
-    int pieces_at_diag(char player){
-        //TODO: Count player's pieces at diagonal line
+    int pieces_at_diag(int player){
+        // initialise counter
+        int count = 0;
+        // Count friendly pieces on the diagonal
+        for (int i = 0; i < 3; i++)
+        {
+            if (board->get_elem(i, i) == player)
+            {
+                count++;
+            }
+        }
+        return count;
     }
-    int pieces_at_anti_diag(char player){
-       //TODO: Count player's pieces at anti-diagonal line
+    int pieces_at_anti_diag(int player){
+        // Initialise counter
+        int count = 0;
+        // Count friendly pieces on the anti-diagonal
+        for (int i = 0; i < 3; i++)
+        {
+            if (board->get_elem(i, (2-i)) == player)
+            {
+                count++;
+            }
+        }
+        return count;
+    }
+
+    // A function to turn Player 1 into "X" and turn Player 2 into "O".
+    char getChar(int player)
+    {
+        if (player == 1)
+        {
+            return 'X';
+        } else if (player == 2)
+        {
+            return 'O';
+        } else
+        {
+            return '*';
+        }
     }
 
     // evaluate the current move using greedy algorithm, 
     // the higher the score is, the better the move is
-    int evaluate(int i, int j, char player){
+    int evaluate(int i, int j, int player){
         // who is player? who is opponent? 
-        char opponent;
-        if (player == 'X')
-            opponent = 'O';
-        else
-            opponent = 'X';
+        int opponent;
+        if (player == 1)
+        {
+            opponent = 2;
+        } else { opponent = 1;}
 
         // evaluate the situiation after the move
         // the higher the score is, the better the move is
@@ -131,7 +180,7 @@ class tictactoe{
             f_ij += pieces_at_diag(player);
             f_ij -= pieces_at_diag(opponent);
         }
-        if(i + j == 4){
+        if(i + j == 2){
             f_ij += pieces_at_anti_diag(player);
             f_ij -= pieces_at_anti_diag(opponent);
         }
@@ -140,36 +189,109 @@ class tictactoe{
     }
 
 
-
 public:
-    tictactoe(): board(3,3) {
-        //TODO: initialize the board with *
+    tictactoe(matrix initialBoard)
+    {
+        // Transfer the starting board matrix to the board variable held within the tictactoe class.
+        board = new matrix(initialBoard.get_num_rows(), initialBoard.get_num_cols());
+        for (int i = 0; i < initialBoard.get_num_rows(); i++)
+        {
+            for (int j = 0; j < initialBoard.get_num_cols(); j++)
+            {
+                board->set_elem(i, j, initialBoard.get_elem(i, j));
+            }
+        }
     }
     
-    void play(int i, int j, char player) {
+    void play(int i, int j, int player) {
         if(isplayable(i, j)) {
             /// fill out the blanks
-            //board.set_elem(__, __, __);
+            board->set_elem(i, j, player);
         }
     }
 
-    void play(char player){
-        // TODO: It play the next move for the "player",
-        // play the move (i,j) is the maximizer of f(i,j)
+    void play(int player){
+        // Iterate through all free spaces on the board and evaluate moves at each square
+        // play a move on the most optimal square according to the evaluate function
+
+        // Store the best score and the square it was obtained in
+        int bestEval = -__INT_MAX__;
+        int bestRow = -1;
+        int bestCol = -1;
+        for (int i = 0; i < board->get_num_rows(); i++)
+        {
+            for (int j = 0; j < board->get_num_cols(); j++)
+            {
+                if (board->get_elem(i, j) == 0)
+                {
+                    int currentEval = evaluate(i, j, player);
+                    if (currentEval > bestEval)
+                    {
+                        bestEval = currentEval;
+                        bestRow = i;
+                        bestCol = j;
+                    }
+                }
+            }
+        }
+        // Play the best move that was found by the for loop above.
+        play(bestRow, bestCol, player);
     }
 
-    // TODO add a print() method!
-
+    // Translate a matrix of 1s, 2s and 0s into Noughts and Crosses grid.
+    void print()
+    {
+        for (int i = 0; i < board->get_num_rows(); i++)
+        {
+            for (int j = 0; j < board->get_num_cols(); j++)
+            {
+                printf("%c ", getChar(board->get_elem(i, j)));
+            }
+            printf("\n");
+        }
+    }
 };
 
 int main()
 {
-    //initialize a random tictactoe board
-    tictactoe game;
     // TODO initialise the board to 
     // X O * 
     // * * * 
     // * * *
-    // and then call game.play('X') and game.play('O') until someone wins!
 
+    // NOTE: in this program I have changed the board to store the player number rather than the character
+    //  as I found it easier to work with an integer array and then translate to actual noughts and crosses
+    // later. I am also getting a "Double free of object error" which I have tried my best to fix but
+    // I'm just not sure what is causing it. It isn't preventing the program from running so I have left it.
+    matrix initialBoard(3,3);
+    initialBoard.set_elem(0, 0, 1);
+    initialBoard.set_elem(0, 1, 2);
+    initialBoard.print();
+
+
+    tictactoe game(initialBoard);
+    printf("STARTING POSITION....\n");
+    game.print();
+    printf("\n");
+    // and then call game.play('X') and game.play('O') until someone wins!
+    printf("Player 1 Plays...\n");
+    game.play(1);
+    game.print();
+    printf("\n");
+
+    printf("Player 2 Plays...\n");
+    game.play(2);
+    game.print();
+    printf("\n");
+
+    printf("Player 1 Plays...\n");
+    game.play(1);
+    game.print();
+    printf("\n");
+
+    printf("Player 2 Plays...\n");
+    game.play(2);
+    game.print();
+    printf("\n");
+    return 0;
 }

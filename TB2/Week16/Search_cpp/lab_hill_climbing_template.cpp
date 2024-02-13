@@ -11,16 +11,19 @@ double f(double x){
 // This function returns xmax that maximizes f(x)
 // between x-epsilon and x+epsilon
 // complete the code yourself
-double subproblem(double xt, double epsilon){
+double subproblem(double xt, double epsilon)
+{
     double x = xt - epsilon;
-    double fmax = -100; // Sloppy!
+    double fmax = -__DBL_MAX__;
     double xmax = x;
-    while(x <= xt + epsilon){
-        //fill out the if statement
-        //if(_____){
-        //  
-        //}
-        x += epsilon/100;
+    while (x <= xt + epsilon)
+    {
+        if (f(x) > fmax)
+        {
+            xmax = x;
+            fmax = f(x);
+        }
+        x += epsilon / 100;
     }
     return xmax;
 }
@@ -34,9 +37,10 @@ int main(){
     
     while( fabs(xt - xt_1) >= 1e-5){ // fabs absolute value function
         xt_1 = xt; 
-        // _________ // fill out the blank
+        xt = subproblem(xt, epsilon);
         printf("f(%.4f) = %.4f\n", xt, f(xt));
     }
 
     printf("Maximum is at %f with value %f\n", xt, f(xt));
+    return 0;
 }
