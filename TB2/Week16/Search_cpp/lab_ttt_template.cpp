@@ -62,7 +62,8 @@ public:
     ~matrix()
     {
         // printf("freeing the matrix...\n");
-        delete[] elements;
+        elements = NULL;
+        free(elements);
     }
 
     // print all elements in the matrix
@@ -202,6 +203,11 @@ public:
             }
         }
     }
+
+    ~tictactoe()
+    {
+        free(board);
+    }
     
     void play(int i, int j, int player) {
         if(isplayable(i, j)) {
@@ -274,6 +280,16 @@ int main()
     game.print();
     printf("\n");
     // and then call game.play('X') and game.play('O') until someone wins!
+    printf("Player 1 Plays...\n");
+    game.play(1);
+    game.print();
+    printf("\n");
+
+    printf("Player 2 Plays...\n");
+    game.play(2);
+    game.print();
+    printf("\n");
+
     printf("Player 1 Plays...\n");
     game.play(1);
     game.print();
